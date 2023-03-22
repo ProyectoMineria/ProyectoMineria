@@ -1,0 +1,82 @@
+---
+title: "Analisis Exploratorio Proyecto"
+format: html
+editor: visual
+---
+
+# Análisis exploratorio: Violencia Intrafamiliar (2012-2021)
+
+```{r librerias}
+library(nortest)
+library(plyr)
+library(readxl)
+library(dplyr)
+library(tidyverse)
+
+```
+
+```{r db}
+db2012<- read_excel("Bases de Datos/Datos2012.xlsx")
+db2013<- read_excel("Bases de Datos/Datos2013.xlsx")
+db2014<- read_excel("Bases de Datos/Datos2014.xlsx")
+db2015<- read_excel("Bases de Datos/Datos2015.xlsx")
+db2016<- read_excel("Bases de Datos/Datos2016.xlsx")
+db2017<- read_excel("Bases de Datos/Datos2017.xlsx")
+db2018<- read_excel("Bases de Datos/Datos2018.xlsx")
+db2019<- read_excel("Bases de Datos/Datos2019.xls")
+db2020<- read_excel("Bases de Datos/Datos2020.xls")
+db2021<- read_excel("Bases de Datos/Datos2021.xlsx")
+```
+
+## Homogeneidad de las bases de datos
+
+A continuación revisaremos que todas las bases de datos contengan las mismas columnas, y eliminaremos las que tengan algunas que no tengan todas, para que podamos contruir un mejor modelo, y las juntaremos en una sola base de datos
+
+```{r dbColNames}
+# clean 2012
+dif <- setdiff(colnames(db2012), colnames(db2013))
+db2012 <- db2012[ , !names(db2012) %in% 
+    dif]
+
+# clean 2013-2021
+
+dif <- setdiff(colnames(db2013), colnames(db2012))
+db2013 <- db2013[ , !names(db2013) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2014), colnames(db2012))
+db2014 <- db2014[ , !names(db2014) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2015), colnames(db2012))
+db2015 <- db2015[ , !names(db2015) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2016), colnames(db2012))
+db2016 <- db2016[ , !names(db2016) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2017), colnames(db2012))
+db2017 <- db2017[ , !names(db2017) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2018), colnames(db2012))
+db2018 <- db2018[ , !names(db2018) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2019), colnames(db2012))
+db2019 <- db2019[ , !names(db2019) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2020), colnames(db2012))
+db2020 <- db2020[ , !names(db2020) %in% 
+    dif]
+
+dif <- setdiff(colnames(db2021), colnames(db2012))
+db2021 <- db2021[ , !names(db2021) %in% 
+    dif]
+
+# Join df
+db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021) 
+
+```
