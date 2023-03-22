@@ -35,48 +35,144 @@ A continuación revisaremos que todas las bases de datos contengan las mismas co
 ```{r dbColNames}
 # clean 2012
 dif <- setdiff(colnames(db2012), colnames(db2013))
-db2012 <- db2012[ , !names(db2012) %in% 
-    dif]
+db2012 <- db2012[ , !names(db2012) %in% dif]
 
 # clean 2013-2021
 
 dif <- setdiff(colnames(db2013), colnames(db2012))
-db2013 <- db2013[ , !names(db2013) %in% 
-    dif]
+db2013 <- db2013[ , !names(db2013) %in% dif]
 
 dif <- setdiff(colnames(db2014), colnames(db2012))
-db2014 <- db2014[ , !names(db2014) %in% 
-    dif]
+db2014 <- db2014[ , !names(db2014) %in% dif]
 
 dif <- setdiff(colnames(db2015), colnames(db2012))
-db2015 <- db2015[ , !names(db2015) %in% 
-    dif]
+db2015 <- db2015[ , !names(db2015) %in% dif]
 
 dif <- setdiff(colnames(db2016), colnames(db2012))
-db2016 <- db2016[ , !names(db2016) %in% 
-    dif]
+db2016 <- db2016[ , !names(db2016) %in% dif]
 
 dif <- setdiff(colnames(db2017), colnames(db2012))
-db2017 <- db2017[ , !names(db2017) %in% 
-    dif]
+db2017 <- db2017[ , !names(db2017) %in% dif]
 
 dif <- setdiff(colnames(db2018), colnames(db2012))
-db2018 <- db2018[ , !names(db2018) %in% 
-    dif]
+db2018 <- db2018[ , !names(db2018) %in% dif]
 
 dif <- setdiff(colnames(db2019), colnames(db2012))
-db2019 <- db2019[ , !names(db2019) %in% 
-    dif]
+db2019 <- db2019[ , !names(db2019) %in% dif]
 
 dif <- setdiff(colnames(db2020), colnames(db2012))
-db2020 <- db2020[ , !names(db2020) %in% 
-    dif]
+db2020 <- db2020[ , !names(db2020) %in% dif]
 
 dif <- setdiff(colnames(db2021), colnames(db2012))
-db2021 <- db2021[ , !names(db2021) %in% 
-    dif]
+db2021 <- db2021[ , !names(db2021) %in% dif]
 
 # Join df
 db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021) 
 
 ```
+
+Procederemos a analizar la base de datos resultante
+
+```{r viewDB}
+View(db12_21)
+nrow(db12_21) 
+ncol(db12_21) 
+str(db12_21)
+
+```
+
+## Clasificación de las variables
+
+### Variables cualitativas
+
+-   DEPTO_MCPIO:
+
+-   QUIEN\_ REPORTA
+
+-   VIC_SEXO
+
+-   VIC_ALFAB
+
+-   VIC_ESCOLARIDAD
+
+-   VIC_EST_CIV
+
+-   VIC_GRUPET
+
+-   VIC_NACIONAL
+
+-   VIC_TRABAJA
+
+-   VIC_OCUP
+
+-   VIC_DEDICA
+
+-   VIC_DISC
+
+-   TIPO_DISCAQ
+
+-   VIC_REL_ADR
+
+-   HEC_DEPTOMCPIO
+
+-   HEC_AREA
+
+-   HEC_TIPAGRE
+
+-   HEC_RECUR_DENUN
+
+-   INST_DONDE_DENUNCIO
+
+-   AGR_SEXO
+
+-   AGR_ALFAB
+
+-   AGR_ESCOLARIDAD
+
+-   AGR_EST_CIV
+
+-   AGR_NACIONAL
+
+-   AGR_TRABAJA
+
+-   AGR_OCUP
+
+-   INST_DENUN_HECHO
+
+-   MEDIDAD_SEGURIDAD
+
+-   LEY_APLICABLE
+
+### Variables cuantitativas
+
+-   ANO_EMISION:
+
+-   MES_EMISION
+
+-   DIA_EMISION
+
+-   VIC_EDAD
+
+-   TOTAL_HIJOS
+
+-   NUM_HIJ_HOM
+
+-   NUM_HIJ_MUJ
+
+-   OTRAS_VICTIMAS
+
+-   VIC_OTRAS_HOM
+
+-   VIC_OTRAS_MUJ
+
+-   VIC_OTRAS_N\_OS
+
+-   VIC_OTRAS_N\_AS
+
+-   HEC_DIA
+
+-   HEC_MES
+
+-   HEC_ANO
+
+-   AGR_EDAD
