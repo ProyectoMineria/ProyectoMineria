@@ -1,1 +1,1 @@
-# ProyectoMinaria
+# ProyectoMineria
