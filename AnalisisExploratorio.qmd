@@ -12,7 +12,7 @@ library(plyr)
 library(readxl)
 library(dplyr)
 library(tidyverse)
-
+library(naniar)
 ```
 
 ```{r db}
@@ -67,7 +67,10 @@ dif <- setdiff(colnames(db2021), colnames(db2012))
 db2021 <- db2021[ , !names(db2021) %in% dif]
 
 # Join df
-db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021) 
+db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021)
+db12_21 <- db12_21 %>% mutate_at(c('ANO_EMISION', 'MES_EMISION', 'DIA_EMISION', 'VIC_EDAD', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ', 'OTRAS_VICTIMAS', 'VIC_OTRAS_HOM', 'VIC_OTRAS_MUJ', 'VIC_OTRAS_N_OS', 'VIC_OTRAS_N_AS', 'HEC_DIA', 'HEC_MES', 'HEC_ANO', 'AGR_EDAD'), as.numeric)
+
+db12_21 <- db12_21 %>% replace_with_na(replace = list('ANO_EMISION' = 99, 'MES_EMISION' = 99, 'DIA_EMISION' = 99, 'VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'OTRAS_VICTIMAS' = 99, 'VIC_OTRAS_HOM' = 99, 'VIC_OTRAS_MUJ' = 99, 'VIC_OTRAS_N_OS' = 99, 'VIC_OTRAS_N_AS' = 99, 'HEC_DIA' = 99, 'HEC_MES' = 99, 'HEC_ANO' = 99, 'AGR_EDAD' = 99))
 
 ```
 
@@ -176,3 +179,52 @@ str(db12_21)
 -   HEC_ANO
 
 -   AGR_EDAD
+
+## Resumen de las variables
+
+### Normalidad de variables numéricas
+
+```{r norm_Vic_Edad}
+qqnorm(db12_21$VIC_EDAD)
+qqline(db12_21$VIC_EDAD)
+
+lillie.test(db12_21$VIC_EDAD)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, VIC_EDAD no se sigue una distribución normal.
+
+```{r norm_TOTAL_HIJOS}
+qqnorm(db12_21$TOTAL_HIJOS)
+qqline(db12_21$TOTAL_HIJOS)
+
+lillie.test(db12_21$TOTAL_HIJOS)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, TOTAL_HIJOS no se sigue una distribución normal.
+
+```{r norm_NUM_HIJ_HOM}
+qqnorm(db12_21$NUM_HIJ_HOM)
+qqline(db12_21$NUM_HIJ_HOM)
+
+lillie.test(db12_21$NUM_HIJ_HOM)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, NUM_HIJ_HOM no se sigue una distribución normal.
+
+```{r norm_NUM_HIJ_MUJ}
+qqnorm(db12_21$NUM_HIJ_MUJ)
+qqline(db12_21$NUM_HIJ_MUJ)
+
+lillie.test(db12_21$NUM_HIJ_MUJ)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, NUM_HIJ_MUJ no se sigue una distribución normal.
+
+```{r norm_OTRAS_VICTIMAS}
+qqnorm(db12_21$OTRAS_VICTIMAS)
+qqline(db12_21$OTRAS_VICTIMAS)
+
+lillie.test(db12_21$OTRAS_VICTIMAS)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, OTRAS_VICTIMAS no se sigue una distribución normal.
