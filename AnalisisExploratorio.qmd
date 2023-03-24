@@ -507,7 +507,7 @@ db12_21 %>% count(LEY_APLICABLE)
 Debido a la cantidad de NA's que presentan las columnas VIC_OCUP, TIPO_DISCAQ e INST_DONDE_DENUNCIO, estas serán retiradas del df para asegurar una cantidad de datos significativa.
 
 ```{r nuevoDF}
-db12_21 <- db12_21[, -c(18, 20, 34)]
+db12_21 <- db12_21[, -c(17, 18, 20, 22, 23, 24, 25, 26, 34, 43)]
 ```
 
 ## Correlacion de los datos
@@ -582,7 +582,7 @@ db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.factor, as.numeric)
 db_1221_mutate  <- na.omit(db_1221_mutate)
 km <- kmeans(db_1221_mutate, 3 , iter.max = 1000)
 db_1221_mutate$grupo <- km$cluster
-plotcluster(db_1221_mutate[1:43], km$cluster)
+plotcluster(db_1221_mutate[1:36], km$cluster)
 
 
 db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.character, as.numeric)
@@ -590,14 +590,10 @@ db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.factor, as.numeric)
 db_1221_mutate  <- na.omit(db_1221_mutate)
 km2 <- kmeans(db_1221_mutate, 4 , iter.max = 1000)
 db_1221_mutate$grupo <- km2$cluster
-plotcluster(db_1221_mutate[1:43], km2$cluster)
+plotcluster(db_1221_mutate[1:36], km2$cluster)
 
 ```
 
 Se realizaron los clusters, tanto para 3 como 4, ya que estos son los valores ideales que nos retorno la gráfica de codo, y estos seran los valores con los que vamos a trabajr nuestro clustering.
 
-# ```{r}
-# db_1221_mutate
-# fviz_cluster(km, data = db_1221_mutate[40:44], drop = TRUE, geom = "point", ellipse.type = "norm")
-# 
-# ```
+# `{r} # db_1221_mutate # fviz_cluster(km, data = db_1221_mutate[40:44], drop = TRUE, geom = "point", ellipse.type = "norm") #  #`
