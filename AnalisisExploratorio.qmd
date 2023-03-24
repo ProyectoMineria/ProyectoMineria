@@ -566,12 +566,17 @@ plot(1:10, wss, type = 'b', xlab = 'Cantidad de grupos', ylab = 'WSS')
 ```
 
 ```{r clusters}
-km <- kmeans(db12_21NoNa, 3 , iter.max = 1000)
-db12_21NoNa$grupo <- km$cluster
+db_1221_mutate <- apply(db12_21NoNa[, 1:43], 2, function(x) as.numeric(as.character(x)))
+km <- kmeans(db_1221_mutate, 3 , iter.max = 1000)
+db_1221_mutate$grupo <- km$cluster
+
+km2 <- kmeans(db12_21NoNa, 4 , iter.max = 1000)
+db_1221_mutate <- apply(db12_21NoNa[, 1:43], 2, function(x) as.numeric(as.character(x)))
+db_1221_mutate$grupo2 <- km2$cluster
 
 ```
 
-```{r}
-km2 <- kmeans(db12_21NoNa, 4 , iter.max = 1000)
-db12_21NoNa$grupo2 <- km2$cluster
+Se realizaron los clusters, tanto para 3 como 4, ya que estos son los valores ideales que nos retorno la gráfica de codo, y estos seran los valores con los que vamos a trabajr nuestro clustering.
+
+```{}
 ```
