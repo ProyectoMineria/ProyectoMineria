@@ -68,9 +68,12 @@ db2021 <- db2021[ , !names(db2021) %in% dif]
 
 # Join df
 db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021)
+
+db12_21 <- db12_21 %>% mutate_at(c('MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), ~replace_na(., 10))
+
 db12_21 <- db12_21 %>% mutate_at(c('ANO_EMISION', 'MES_EMISION', 'DIA_EMISION', 'VIC_EDAD', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ', 'OTRAS_VICTIMAS', 'VIC_OTRAS_HOM', 'VIC_OTRAS_MUJ', 'VIC_OTRAS_N_OS', 'VIC_OTRAS_N_AS', 'HEC_DIA', 'HEC_MES', 'HEC_ANO', 'AGR_EDAD'), as.numeric)
 
-db12_21 <- db12_21 %>% replace_with_na(replace = list('ANO_EMISION' = 99, 'MES_EMISION' = 99, 'DIA_EMISION' = 99, 'VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'OTRAS_VICTIMAS' = 99, 'VIC_OTRAS_HOM' = 99, 'VIC_OTRAS_MUJ' = 99, 'VIC_OTRAS_N_OS' = 99, 'VIC_OTRAS_N_AS' = 99, 'HEC_DIA' = 99, 'HEC_MES' = 99, 'HEC_ANO' = 9999, 'AGR_EDAD' = 99, 'QUIEN_REPORTA' = 9, 'VIC_ALFAB' = 9, 'VIC_ESCOLARIDAD' = c(29, 39, 49, 59, 99), 'VIC_EST_CIV' = 9, 'VIC_GRUPET' = 9, 'VIC_NACIONAL' = 9, 'VIC_TRABAJA' = 9, 'VIC_OCUP' = 9999, 'VIC_DEDICA' = 9, 'VIC_DISC' = 9, 'VIC_DISCAQ' = 9, 'VIC_DEPTOMCPIO' = 9999, 'HEC_AREA' = 9, 'HEC_RECUR_DENUN' = 9, 'INST_DONDE_DENUNCIO' = 9, 'AGR_ALFAB' = 9, 'AGR_ESCOLARIDAD' = c(29, 39, 49, 59, 99), 'AGR_EST_CIV' = 9, 'AGR_GRUPET' = 9, 'AGR_NACIONAL' = 9, 'AGR_TRABAJA' = 9, 'AGR_OCUP' = 9999, 'MEDIDAS_SEGURIDAD' = 9, 'LEY_APLICABLE' = 9))
+db12_21 <- db12_21 %>% replace_with_na(replace = list('ANO_EMISION' = 99, 'MES_EMISION' = 99, 'DIA_EMISION' = 99, 'VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'OTRAS_VICTIMAS' = 99, 'VIC_OTRAS_HOM' = 99, 'VIC_OTRAS_MUJ' = 99, 'VIC_OTRAS_N_OS' = 99, 'VIC_OTRAS_N_AS' = 99, 'HEC_DIA' = 99, 'HEC_MES' = 99, 'HEC_ANO' = 9999, 'AGR_EDAD' = 99))
 
 db12_21 <- db12_21 %>% mutate_at(c('DEPTO_MCPIO', 'QUIEN_REPORTA', 'VIC_SEXO', 'VIC_ALFAB', 'VIC_ESCOLARIDAD', 'VIC_EST_CIV', 'VIC_GRUPET', 'VIC_NACIONAL', 'VIC_TRABAJA', 'VIC_OCUP', 'VIC_DEDICA', 'VIC_DISC', 'TIPO_DISCAQ', 'VIC_REL_AGR', 'HEC_DEPTOMCPIO', 'HEC_AREA', 'HEC_TIPAGRE', 'HEC_RECUR_DENUN', 'INST_DONDE_DENUNCIO', 'AGR_SEXO', 'AGR_ALFAB', 'AGR_ESCOLARIDAD', 'AGR_EST_CIV', 'AGR_NACIONAL', 'AGR_TRABAJA', 'AGR_OCUP', 'INST_DENUN_HECHO', 'MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), as.factor)
 ```
@@ -82,7 +85,6 @@ View(db12_21)
 nrow(db12_21) 
 ncol(db12_21) 
 str(db12_21)
-
 ```
 
 ## Clasificación de las variables
@@ -143,7 +145,7 @@ str(db12_21)
 
 -   INST_DENUN_HECHO
 
--   MEDIDAD_SEGURIDAD
+-   MEDIDAS_SEGURIDAD
 
 -   LEY_APLICABLE
 
@@ -284,6 +286,15 @@ lillie.test(db12_21$HEC_MES)
 
 Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, HEC_MES no se sigue una distribución normal.
 
+```{r norm_HEC_ANO}
+qqnorm(db12_21$HEC_ANO)
+qqline(db12_21$HEC_ANO)
+
+lillie.test(db12_21$HEC_ANO)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, HEC_ANO no se sigue una distribución normal.
+
 ```{r norm_AGR_EDAD}
 qqnorm(db12_21$AGR_EDAD)
 qqline(db12_21$AGR_EDAD)
@@ -295,9 +306,184 @@ Analizando la gráfica, resulta evidente que la variable no se comporta de forma
 
 ### Tablas de frecuencia
 
+#### DEPTO_MCPIO
+
 ```{r freq_DEPTO_MCPIO}
-table(db12_21$DEPTO_MCPIO)
-str(db12_21$DEPTO_MCPIO)
+db12_21 %>% count(DEPTO_MCPIO)
 ```
 
-### 
+#### QUIEN_REPORTA
+
+```{r freq_QUIEN_REPORTA}
+db12_21 %>% count(QUIEN_REPORTA)
+```
+
+#### VIC_SEXO
+
+```{r freq_VIC_SEXO}
+db12_21 %>% count(VIC_SEXO)
+```
+
+#### VIC_ALFAB
+
+```{r freq_VIC_ALFAB}
+db12_21 %>% count(VIC_ALFAB)
+```
+
+#### VIC_ESCOLARIDAD
+
+```{r freq_VIC_ESCOLARIDAD}
+db12_21 %>% count(VIC_ESCOLARIDAD)
+```
+
+#### VIC_EST_CIV
+
+```{r freq_VIC_EST_CIV}
+db12_21 %>% count(VIC_EST_CIV)
+```
+
+#### VIC_GRUPET
+
+```{r freq_VIC_GRUPET}
+db12_21 %>% count(VIC_GRUPET)
+```
+
+#### VIC_NACIONAL
+
+```{r freq_VIC_NACIONAL}
+db12_21 %>% count(VIC_NACIONAL)
+```
+
+#### VIC_TRABAJA
+
+```{r freq_VIC_TRABAJA}
+db12_21 %>% count(VIC_TRABAJA)
+```
+
+#### VIC_OCUP
+
+```{r freq_VIC_OCUP}
+db12_21 %>% count(VIC_OCUP)
+```
+
+#### VIC_DEDICA
+
+```{r freq_VIC_DEDICA}
+db12_21 %>% count(VIC_DEDICA)
+```
+
+#### VIC_DISC
+
+```{r freq_VIC_DISC}
+db12_21 %>% count(VIC_DISC)
+```
+
+#### TIPO_DISCAQ
+
+```{r freq_TIPO_DISCAQ}
+db12_21 %>% count(TIPO_DISCAQ)
+```
+
+#### VIC_REL_AGR
+
+```{r freq_VIC_REL_AGR}
+db12_21 %>% count(VIC_REL_AGR)
+```
+
+#### HEC_DEPTOMCPIO
+
+```{r freq_HEC_DEPTOMCPIO}
+db12_21 %>% count(HEC_DEPTOMCPIO)
+```
+
+#### HEC_AREA
+
+```{r freq_HEC_AREA}
+db12_21 %>% count(HEC_AREA)
+```
+
+#### HEC_TIPAGRE
+
+```{r freq_HEC_TIPAGRE}
+db12_21 %>% count(HEC_TIPAGRE)
+```
+
+#### HEC_RECUR_DENUN
+
+```{r freq_HEC_RECUR_DENUN}
+db12_21 %>% count(HEC_RECUR_DENUN)
+```
+
+#### INST_DONDE_DENUNCIO
+
+```{r freq_INST_DONDE_DENUNCIO}
+db12_21 %>% count(INST_DONDE_DENUNCIO)
+```
+
+#### AGR_SEXO
+
+```{r freq_AGR_SEXO}
+db12_21 %>% count(AGR_SEXO)
+```
+
+#### AGR_ALFAB
+
+```{r freq_AGR_ALFAB}
+db12_21 %>% count(AGR_ALFAB)
+```
+
+#### AGR_ESCOLARIDAD
+
+```{r freq_AGR_ESCOLARIDAD}
+db12_21 %>% count(AGR_ESCOLARIDAD)
+```
+
+#### AGR_EST_CIV
+
+```{r freq_AGR_EST_CIV}
+db12_21 %>% count(AGR_EST_CIV)
+```
+
+#### AGR_NACIONAL
+
+```{r freq_AGR_NACIONAL}
+db12_21 %>% count(AGR_NACIONAL)
+```
+
+#### AGR_TRABAJA
+
+```{r freq_AGR_TRABAJA}
+db12_21 %>% count(AGR_TRABAJA)
+```
+
+#### AGR_OCUP
+
+```{r freq_AGR_OCUP}
+db12_21 %>% count(AGR_OCUP)
+```
+
+#### INST_DENUN_HECHO
+
+```{r freq_INST_DENUN_HECHO}
+db12_21 %>% count(INST_DENUN_HECHO)
+```
+
+#### MEDIDAS_SEGURIDAD
+
+```{r freq_MEDIDAS_SEGURIDAD}
+db12_21 %>% count(MEDIDAS_SEGURIDAD)
+```
+
+#### LEY_APLICABLE
+
+```{r freq_LEY_APLICABLE}
+db12_21 %>% count(LEY_APLICABLE)
+```
+
+## Nuevos datos
+
+Debido a la cantidad de NA's que presentan las columnas VIC_OCUP, TIPO_DISCAQ e INST_DONDE_DENUNCIO, estas serán retiradas del df para asegurar una cantidad de datos significativa.
+
+```{r nuevoDF}
+db12_21 <- db12_21[, -c(18, 20, 34)]
+```
