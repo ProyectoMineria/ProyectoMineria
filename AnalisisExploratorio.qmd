@@ -68,7 +68,23 @@ db2021 <- db2021[ , !names(db2021) %in% dif]
 
 # Join df
 db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021)
+```
 
+## Alteraciones a las columnas de la base de datos
+
+Para garantizar que las acciones a relizar con la base de datos sean exitosas, es necesario relizar algunas modificaciones, las cuales se listan enseguida:
+
+-   Cambiar los NA's de MEDIDAS_SEGURIDAD y LEY_APLICABLE por una nueva variable la cual representará los casos no procesados, ya estas dos variables deben ser llenadas por el estado.
+
+-   Asegurarse que las variables cuantitativas posean un tipo de dato numérico.
+
+-   Cambiar los "Ignorado" de las variables cuantitativas por NA's
+
+-   Convertir a factores las variables cualitativas
+
+Los "Ignorado" de las variables cualitativas no serán cambiados por NA's, pues, al ser una base de datos que representa un proceso para la toma de decisiones, omitir alguna casilla del formulario podría alterar la decisión final del juez.
+
+```{r alteraciones}
 db12_21 <- db12_21 %>% mutate_at(c('MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), ~replace_na(., 10))
 
 db12_21 <- db12_21 %>% mutate_at(c('ANO_EMISION', 'MES_EMISION', 'DIA_EMISION', 'VIC_EDAD', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ', 'OTRAS_VICTIMAS', 'VIC_OTRAS_HOM', 'VIC_OTRAS_MUJ', 'VIC_OTRAS_N_OS', 'VIC_OTRAS_N_AS', 'HEC_DIA', 'HEC_MES', 'HEC_ANO', 'AGR_EDAD'), as.numeric)
