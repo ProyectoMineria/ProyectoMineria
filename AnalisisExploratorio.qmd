@@ -70,8 +70,9 @@ db2021 <- db2021[ , !names(db2021) %in% dif]
 db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021)
 db12_21 <- db12_21 %>% mutate_at(c('ANO_EMISION', 'MES_EMISION', 'DIA_EMISION', 'VIC_EDAD', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ', 'OTRAS_VICTIMAS', 'VIC_OTRAS_HOM', 'VIC_OTRAS_MUJ', 'VIC_OTRAS_N_OS', 'VIC_OTRAS_N_AS', 'HEC_DIA', 'HEC_MES', 'HEC_ANO', 'AGR_EDAD'), as.numeric)
 
-db12_21 <- db12_21 %>% replace_with_na(replace = list('ANO_EMISION' = 99, 'MES_EMISION' = 99, 'DIA_EMISION' = 99, 'VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'OTRAS_VICTIMAS' = 99, 'VIC_OTRAS_HOM' = 99, 'VIC_OTRAS_MUJ' = 99, 'VIC_OTRAS_N_OS' = 99, 'VIC_OTRAS_N_AS' = 99, 'HEC_DIA' = 99, 'HEC_MES' = 99, 'HEC_ANO' = 99, 'AGR_EDAD' = 99))
+db12_21 <- db12_21 %>% replace_with_na(replace = list('ANO_EMISION' = 99, 'MES_EMISION' = 99, 'DIA_EMISION' = 99, 'VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'OTRAS_VICTIMAS' = 99, 'VIC_OTRAS_HOM' = 99, 'VIC_OTRAS_MUJ' = 99, 'VIC_OTRAS_N_OS' = 99, 'VIC_OTRAS_N_AS' = 99, 'HEC_DIA' = 99, 'HEC_MES' = 99, 'HEC_ANO' = 9999, 'AGR_EDAD' = 99, 'QUIEN_REPORTA' = 9, 'VIC_ALFAB' = 9, 'VIC_ESCOLARIDAD' = c(29, 39, 49, 59, 99), 'VIC_EST_CIV' = 9, 'VIC_GRUPET' = 9, 'VIC_NACIONAL' = 9, 'VIC_TRABAJA' = 9, 'VIC_OCUP' = 9999, 'VIC_DEDICA' = 9, 'VIC_DISC' = 9, 'VIC_DISCAQ' = 9, 'VIC_DEPTOMCPIO' = 9999, 'HEC_AREA' = 9, 'HEC_RECUR_DENUN' = 9, 'INST_DONDE_DENUNCIO' = 9, 'AGR_ALFAB' = 9, 'AGR_ESCOLARIDAD' = c(29, 39, 49, 59, 99), 'AGR_EST_CIV' = 9, 'AGR_GRUPET' = 9, 'AGR_NACIONAL' = 9, 'AGR_TRABAJA' = 9, 'AGR_OCUP' = 9999, 'MEDIDAS_SEGURIDAD' = 9, 'LEY_APLICABLE' = 9))
 
+db12_21 <- db12_21 %>% mutate_at(c('DEPTO_MCPIO', 'QUIEN_REPORTA', 'VIC_SEXO', 'VIC_ALFAB', 'VIC_ESCOLARIDAD', 'VIC_EST_CIV', 'VIC_GRUPET', 'VIC_NACIONAL', 'VIC_TRABAJA', 'VIC_OCUP', 'VIC_DEDICA', 'VIC_DISC', 'TIPO_DISCAQ', 'VIC_REL_AGR', 'HEC_DEPTOMCPIO', 'HEC_AREA', 'HEC_TIPAGRE', 'HEC_RECUR_DENUN', 'INST_DONDE_DENUNCIO', 'AGR_SEXO', 'AGR_ALFAB', 'AGR_ESCOLARIDAD', 'AGR_EST_CIV', 'AGR_NACIONAL', 'AGR_TRABAJA', 'AGR_OCUP', 'INST_DENUN_HECHO', 'MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), as.factor)
 ```
 
 Procederemos a analizar la base de datos resultante
@@ -228,3 +229,75 @@ lillie.test(db12_21$OTRAS_VICTIMAS)
 ```
 
 Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, OTRAS_VICTIMAS no se sigue una distribución normal.
+
+```{r norm_VIC_OTRAS_HOM}
+qqnorm(db12_21$VIC_OTRAS_HOM)
+qqline(db12_21$VIC_OTRAS_HOM)
+
+lillie.test(db12_21$VIC_OTRAS_HOM)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, VIC_OTRAS_HOM no se sigue una distribución normal.
+
+```{r norm_VIC_OTRAS_MUJ}
+qqnorm(db12_21$VIC_OTRAS_MUJ)
+qqline(db12_21$VIC_OTRAS_MUJ)
+
+lillie.test(db12_21$VIC_OTRAS_MUJ)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, VIC_OTRAS_MUJ no se sigue una distribución normal.
+
+```{r norm_VIC_OTRAS_N_OS}
+qqnorm(db12_21$VIC_OTRAS_N_OS)
+qqline(db12_21$VIC_OTRAS_N_OS)
+
+lillie.test(db12_21$VIC_OTRAS_N_OS)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, VIC_OTRAS_N\_OS no se sigue una distribución normal.
+
+```{r norm_VIC_OTRAS_N_AS}
+qqnorm(db12_21$VIC_OTRAS_N_AS)
+qqline(db12_21$VIC_OTRAS_N_AS)
+
+lillie.test(db12_21$VIC_OTRAS_N_AS)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, VIC_OTRAS_N\_AS no se sigue una distribución normal.
+
+```{r norm_HEC_DIA}
+qqnorm(db12_21$HEC_DIA)
+qqline(db12_21$HEC_DIA)
+
+lillie.test(db12_21$HEC_DIA)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, HEC_DIA no se sigue una distribución normal.
+
+```{r norm_HEC_MES}
+qqnorm(db12_21$HEC_MES)
+qqline(db12_21$HEC_MES)
+
+lillie.test(db12_21$HEC_MES)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, HEC_MES no se sigue una distribución normal.
+
+```{r norm_AGR_EDAD}
+qqnorm(db12_21$AGR_EDAD)
+qqline(db12_21$AGR_EDAD)
+
+lillie.test(db12_21$AGR_EDAD)
+```
+
+Analizando la gráfica, resulta evidente que la variable no se comporta de forma normal, lo cual se confirma al realizar una prueba de Lilliefors, pues \$\$ \text{p-value} \< 0.05 \implies H_0 \$\$ debe ser rechazada. Por lo tanto, AGR_EDAD no se sigue una distribución normal.
+
+### Tablas de frecuencia
+
+```{r freq_DEPTO_MCPIO}
+table(db12_21$DEPTO_MCPIO)
+str(db12_21$DEPTO_MCPIO)
+```
+
+### 
