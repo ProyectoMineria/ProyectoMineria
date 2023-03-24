@@ -13,6 +13,8 @@ library(readxl)
 library(dplyr)
 library(tidyverse)
 library(naniar)
+library(ggcorrplot)
+library(patchwork)
 ```
 
 ```{r db}
@@ -70,44 +72,11 @@ db2021 <- db2021[ , !names(db2021) %in% dif]
 db12_21 <- rbind(db2012, db2013, db2014, db2015, db2016, db2017, db2018, db2019, db2020, db2021)
 ```
 
-## Alteraciones a las columnas de la base de datos
-
-Para garantizar que las acciones a relizar con la base de datos sean exitosas, es necesario relizar algunas modificaciones, las cuales se listan enseguida:
-
--   Cambiar los NA's de MEDIDAS_SEGURIDAD y LEY_APLICABLE por una nueva variable la cual representará los casos no procesados, ya estas dos variables deben ser llenadas por el estado.
-
--   Asegurarse que las variables cuantitativas posean un tipo de dato numérico.
-
--   Cambiar los "Ignorado" de las variables cuantitativas por NA's
-
--   Convertir a factores las variables cualitativas
-
-Los "Ignorado" de las variables cualitativas no serán cambiados por NA's, pues, al ser una base de datos que representa un proceso para la toma de decisiones, omitir alguna casilla del formulario podría alterar la decisión final del juez.
-
-```{r alteraciones}
-db12_21 <- db12_21 %>% mutate_at(c('MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), ~replace_na(., 10))
-
-db12_21 <- db12_21 %>% mutate_at(c('ANO_EMISION', 'MES_EMISION', 'DIA_EMISION', 'VIC_EDAD', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ', 'OTRAS_VICTIMAS', 'VIC_OTRAS_HOM', 'VIC_OTRAS_MUJ', 'VIC_OTRAS_N_OS', 'VIC_OTRAS_N_AS', 'HEC_DIA', 'HEC_MES', 'HEC_ANO', 'AGR_EDAD'), as.numeric)
-
-db12_21 <- db12_21 %>% replace_with_na(replace = list('ANO_EMISION' = 99, 'MES_EMISION' = 99, 'DIA_EMISION' = 99, 'VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'OTRAS_VICTIMAS' = 99, 'VIC_OTRAS_HOM' = 99, 'VIC_OTRAS_MUJ' = 99, 'VIC_OTRAS_N_OS' = 99, 'VIC_OTRAS_N_AS' = 99, 'HEC_DIA' = 99, 'HEC_MES' = 99, 'HEC_ANO' = 9999, 'AGR_EDAD' = 99))
-
-db12_21 <- db12_21 %>% mutate_at(c('DEPTO_MCPIO', 'QUIEN_REPORTA', 'VIC_SEXO', 'VIC_ALFAB', 'VIC_ESCOLARIDAD', 'VIC_EST_CIV', 'VIC_GRUPET', 'VIC_NACIONAL', 'VIC_TRABAJA', 'VIC_OCUP', 'VIC_DEDICA', 'VIC_DISC', 'TIPO_DISCAQ', 'VIC_REL_AGR', 'HEC_DEPTOMCPIO', 'HEC_AREA', 'HEC_TIPAGRE', 'HEC_RECUR_DENUN', 'INST_DONDE_DENUNCIO', 'AGR_SEXO', 'AGR_ALFAB', 'AGR_ESCOLARIDAD', 'AGR_EST_CIV', 'AGR_NACIONAL', 'AGR_TRABAJA', 'AGR_OCUP', 'INST_DENUN_HECHO', 'MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), as.factor)
-```
-
-Procederemos a analizar la base de datos resultante
-
-```{r viewDB}
-View(db12_21)
-nrow(db12_21) 
-ncol(db12_21) 
-str(db12_21)
-```
-
 ## Clasificación de las variables
 
 ### Variables cualitativas
 
--   DEPTO_MCPIO:
+-   DEPTO_MCPIO
 
 -   QUIEN\_ REPORTA
 
@@ -198,6 +167,39 @@ str(db12_21)
 -   HEC_ANO
 
 -   AGR_EDAD
+
+## Alteraciones a las columnas de la base de datos
+
+Para garantizar que las acciones a relizar con la base de datos sean exitosas, es necesario relizar algunas modificaciones, las cuales se listan enseguida:
+
+-   Cambiar los NA's de MEDIDAS_SEGURIDAD y LEY_APLICABLE por una nueva variable la cual representará los casos no procesados, ya estas dos variables deben ser llenadas por el estado.
+
+-   Asegurarse que las variables cuantitativas posean un tipo de dato numérico.
+
+-   Cambiar los "Ignorado" de las variables cuantitativas por NA's
+
+-   Convertir a factores las variables cualitativas
+
+Los "Ignorado" de las variables cualitativas no serán cambiados por NA's, pues, al ser una base de datos que representa un proceso para la toma de decisiones, omitir alguna casilla del formulario podría alterar la decisión final del juez.
+
+```{r alteraciones}
+db12_21 <- db12_21 %>% mutate_at(c('MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), ~replace_na(., 10))
+
+db12_21 <- db12_21 %>% mutate_at(c('ANO_EMISION', 'MES_EMISION', 'DIA_EMISION', 'VIC_EDAD', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ', 'OTRAS_VICTIMAS', 'VIC_OTRAS_HOM', 'VIC_OTRAS_MUJ', 'VIC_OTRAS_N_OS', 'VIC_OTRAS_N_AS', 'HEC_DIA', 'HEC_MES', 'HEC_ANO', 'AGR_EDAD'), as.numeric)
+
+db12_21 <- db12_21 %>% replace_with_na(replace = list('ANO_EMISION' = 99, 'MES_EMISION' = 99, 'DIA_EMISION' = 99, 'VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'OTRAS_VICTIMAS' = 99, 'VIC_OTRAS_HOM' = 99, 'VIC_OTRAS_MUJ' = 99, 'VIC_OTRAS_N_OS' = 99, 'VIC_OTRAS_N_AS' = 99, 'HEC_DIA' = 99, 'HEC_MES' = 99, 'HEC_ANO' = 9999, 'AGR_EDAD' = 99))
+
+db12_21 <- db12_21 %>% mutate_at(c('DEPTO_MCPIO', 'QUIEN_REPORTA', 'VIC_SEXO', 'VIC_ALFAB', 'VIC_ESCOLARIDAD', 'VIC_EST_CIV', 'VIC_GRUPET', 'VIC_NACIONAL', 'VIC_TRABAJA', 'VIC_OCUP', 'VIC_DEDICA', 'VIC_DISC', 'TIPO_DISCAQ', 'VIC_REL_AGR', 'HEC_DEPTOMCPIO', 'HEC_AREA', 'HEC_TIPAGRE', 'HEC_RECUR_DENUN', 'INST_DONDE_DENUNCIO', 'AGR_SEXO', 'AGR_ALFAB', 'AGR_ESCOLARIDAD', 'AGR_EST_CIV', 'AGR_NACIONAL', 'AGR_TRABAJA', 'AGR_OCUP', 'INST_DENUN_HECHO', 'MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), as.factor)
+```
+
+Procederemos a analizar la base de datos resultante
+
+```{r viewDB}
+View(db12_21)
+nrow(db12_21) 
+ncol(db12_21) 
+str(db12_21)
+```
 
 ## Resumen de las variables
 
@@ -508,11 +510,9 @@ db12_21 <- db12_21[, -c(18, 20, 34)]
 
 ```{r}
 corelacion<- cor(apply(db12_21,2,function(x) as.numeric(as.character(x))))
-library(ggcorrplot)
 ggcorrplot(corelacion, type = "lower",
      outline.col = "white")
 ```
-
 
 como podemos ver, hay la mayoria de variables no tiene correlacion alguna con otras, o al menos no una significativa, la variables que ya tienen una corelacion que vale la pena mencionar, mas es muy baja aun son relaciones como agr-alfab con agr-trabaja o agr escolaridad con un nivel de correlacion de 0.37 y 0.4 respectivamente
 
@@ -544,7 +544,5 @@ ggplot(db12_21, aes(x=VIC_ESCOLARIDAD, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURID
 ggplot(db12_21, aes(x=VIC_EST_CIV, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))+geom_bar(stat ="identity")+labs(title = "Estado civil de las victimas", x="Victimas", y="Medidas tomadas")+theme_minimal()
 
 ```
-1 -> otorgadas
-2 -> no otorgadas
-9 -> sin respuesta
-10 -> no procesado
+
+1 -\> otorgadas 2 -\> no otorgadas 9 -\> sin respuesta 10 -\> no procesado
