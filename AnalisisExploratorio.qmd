@@ -519,3 +519,32 @@ como podemos ver, hay la mayoria de variables no tiene correlacion alguna con ot
 ahora, las correlaciones mas grandes son las de hect-deptomcpio con deptomcpio, con 0.8 y vic-sexo con agr-sexo, con -0.56, esta primera no nos dice mucho, solo que la violencia suele ocurrir en el lugar donde la gente vive, a cambio la otra nos puede estar indicando que la violencia es hacia el sexo opuesto.
 
 al final, la correlacion directa entre las variables no es para nada significativa, por lo que se descarta la idea de realizar una regresión lineal como modelo de predicción
+
+### Graficos Exploratorios
+
+```{r graphs}
+#cate>cual>medidas
+#num>cuan>num_hij
+g1 <- ggplot(data = db12_21, aes(x=NUM_HIJ_HOM))+geom_density()+labs(title = "Hijos Hombres", x="Numero de hijos hombres")+theme_minimal()
+g2 <- ggplot(data = db12_21, aes(x=NUM_HIJ_HOM, fill=MEDIDAS_SEGURIDAD))+geom_density(alpha=0.4)+xlab("Numero hijos hombres y medidas de seguridad")+theme_minimal()
+g1 + g2
+
+g3 <- ggplot(data = db12_21, aes(x=NUM_HIJ_MUJ))+geom_density()+labs(title = "Hijas Mujeres", x="Numero de hijas mujeres")+theme_minimal()
+g4 <- ggplot(data = db12_21, aes(x=NUM_HIJ_MUJ, fill=MEDIDAS_SEGURIDAD))+geom_density(alpha=0.4)+xlab("Numero hijas mujeres y medidas de seguridad")+theme_minimal()
+g3 + g4
+
+g5 <- ggplot(data = db12_21, aes(x=MES_EMISION))+geom_density()+labs(title = "Meses donde se hicieron denuncias", x="Mes")+theme_minimal()
+g6 <- ggplot(data = db12_21, aes(x=MES_EMISION, fill=MEDIDAS_SEGURIDAD))+geom_density(alpha=0.4)+xlab("Mes de denuncia y medidas de seguridad")+theme_minimal()
+g5 + g6
+```
+
+```{r graphs}
+ggplot(db12_21, aes(x=VIC_TRABAJA, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))+geom_bar(stat ="identity")+labs(title = "Victimas que trabajan", x="Victimas", y="Medidas tomadas")+theme_minimal()
+ggplot(db12_21, aes(x=VIC_ESCOLARIDAD, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))+geom_bar(stat ="identity")+labs(title = "Victimas que estudian", x="Victimas", y="Medidas tomadas")+theme_minimal()
+ggplot(db12_21, aes(x=VIC_EST_CIV, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))+geom_bar(stat ="identity")+labs(title = "Estado civil de las victimas", x="Victimas", y="Medidas tomadas")+theme_minimal()
+
+```
+1 -> otorgadas
+2 -> no otorgadas
+9 -> sin respuesta
+10 -> no procesado
