@@ -18,6 +18,7 @@ library(patchwork)
 library(VarSelLCM)
 library(fpc)
 library(ggplot2)
+library(factoextra)
 ```
 
 ```{r db}
@@ -566,17 +567,26 @@ plot(1:10, wss, type = 'b', xlab = 'Cantidad de grupos', ylab = 'WSS')
 ```
 
 ```{r clusters}
-db_1221_mutate <- apply(db12_21NoNa[, 1:43], 2, function(x) as.numeric(as.character(x)))
+db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.character, as.numeric)
+db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.factor, as.numeric)
+db_1221_mutate  <- na.omit(db_1221_mutate)
 km <- kmeans(db_1221_mutate, 3 , iter.max = 1000)
 db_1221_mutate$grupo <- km$cluster
+plotcluster(db_1221_mutate[1:43], km$cluster)
 
-km2 <- kmeans(db12_21NoNa, 4 , iter.max = 1000)
-db_1221_mutate <- apply(db12_21NoNa[, 1:43], 2, function(x) as.numeric(as.character(x)))
-db_1221_mutate$grupo2 <- km2$cluster
+
+db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.character, as.numeric)
+db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.factor, as.numeric)
+db_1221_mutate  <- na.omit(db_1221_mutate)
+km2 <- kmeans(db_1221_mutate, 4 , iter.max = 1000)
+db_1221_mutate$grupo <- km2$cluster
+plotcluster(db_1221_mutate[1:43], km2$cluster)
 
 ```
 
 Se realizaron los clusters, tanto para 3 como 4, ya que estos son los valores ideales que nos retorno la gráfica de codo, y estos seran los valores con los que vamos a trabajr nuestro clustering.
 
-```{}
+```{r}
+db_1221_mutate
+fviz_cluster(km, data = db_1221_mutate[40:44], drop = TRUE, geom = "point", ellipse.type = "norm")
 ```
