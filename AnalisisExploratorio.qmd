@@ -15,6 +15,9 @@ library(tidyverse)
 library(naniar)
 library(ggcorrplot)
 library(patchwork)
+library(VarSelLCM)
+library(fpc)
+library(ggplot2)
 ```
 
 ```{r db}
@@ -560,4 +563,15 @@ for (i in 1:10) {
 }
 
 plot(1:10, wss, type = 'b', xlab = 'Cantidad de grupos', ylab = 'WSS')
+```
+
+```{r clusters}
+km <- kmeans(db12_21NoNa, 3 , iter.max = 1000)
+db12_21NoNa$grupo <- km$cluster
+
+```
+
+```{r}
+km2 <- kmeans(db12_21NoNa, 4 , iter.max = 1000)
+db12_21NoNa$grupo2 <- km2$cluster
 ```
