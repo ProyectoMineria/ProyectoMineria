@@ -542,12 +542,23 @@ g6 <- ggplot(data = db12_21, aes(x=MES_EMISION, fill=MEDIDAS_SEGURIDAD))+geom_de
 g5 + g6
 ```
 
+Como se puede observar en las primeras 2 gráficas, el índice de violencia intrafamiliar disminuía conforme menos hijos tenían las familias, ya sea hombres o mujeres. De igual forma la cantidad de medidas de seguridad procesadas era mayor mientras menos hijos hubieran, pero no quita el preocupante hecho de que un gran número de medidas no llegaban a ser procesadas. Cabe mencionar que las mujeres denunciaron menos casos que los hombres, por lo que podría asumirse que las mujeres son menos propensas a ser víctimas de violencia intrafamiliar.
+
+A lo largo de los años, los meses con mayor cantidad de denuncias de violencia fueron mayo y julio, pero también fueron los meses donde más se otorgaron medidas de seguridad apropiadas a la situación. Puede observarse que entre enero y febrero ocurrieron la mayor cantidad de medidas no otorgadas y, sorpendentemente, a lo largo de los años un gran número de las denuncias ni siquiera fueron procesadas, teniendo ciertos meses como febrero donde era casi la misma cantidad de denuncias cuyas medidas si fueron otorgadas. 
+
+
 ```{r graphs}
 ggplot(db12_21, aes(x=VIC_TRABAJA, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))+geom_bar(stat ="identity")+labs(title = "Victimas que trabajan", x="Victimas", y="Medidas tomadas")+theme_minimal()
 ggplot(db12_21, aes(x=VIC_ESCOLARIDAD, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))+geom_bar(stat ="identity")+labs(title = "Victimas que estudian", x="Victimas", y="Medidas tomadas")+theme_minimal()
 ggplot(db12_21, aes(x=VIC_EST_CIV, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))+geom_bar(stat ="identity")+labs(title = "Estado civil de las victimas", x="Victimas", y="Medidas tomadas")+theme_minimal()
 
 ```
+Las gráficas anteriores muestran una correlación con las victimas que trabajan y las medidas de seguridad que se tomaron. Se puede observar que se tenía cierto nivel de prioridad acerca las victimas que no trabajaban sobre las que sí, que tuvieron un mayor índice de medidas otorgadas, pero ambos grupos siempre tuvieron medidas sin procesar.
+
+Es preocupante observar que las edades con más cantidades de denuncias fueron sexto primaria (26), o primaria en general (29), tercero básico (33) y diversificado en general (49). Mientras más pequeñas las víctimas, mayor es la posibilidad de que ocurra una denuncia, por lo que debería tomarse medidas más drásticas para evitarlo, considerando que todos los niveles cada uno tiene una cantidad medidas sin procesar muy parecida a las si orotgadas.
+
+Igualmente, las víctimas cuyo estado civil era casado (2) o con pareja (3) tuvieron las mayores cantidades de denuncias, ambas con altos niveles de medidas otorgadas pero siempre muchas sin procesar. Incluso las personas solteras (1) tuvieron denuncias de violencia, muy seguramente proviniendo de su hogar.
+
 
 1 -\> otorgadas 2 -\> no otorgadas 9 -\> sin respuesta 10 -\> no procesado
 
