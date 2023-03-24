@@ -546,3 +546,18 @@ ggplot(db12_21, aes(x=VIC_EST_CIV, y=MEDIDAS_SEGURIDAD, fill=MEDIDAS_SEGURIDAD))
 ```
 
 1 -\> otorgadas 2 -\> no otorgadas 9 -\> sin respuesta 10 -\> no procesado
+
+## Clustering
+
+### Gráfica de codo
+
+```{r wss}
+db12_21Num  <- dplyr::mutate_if(db12_21, is.numeric, scale)
+db12_21NoNa <- na.omit(db12_21Num)
+wss <- 0
+for (i in 1:10) {
+  wss[i] <- sum(kmeans(db12_21NoNa, centers = i)$withins)
+}
+
+plot(1:10, wss, type = 'b', xlab = 'Cantidad de grupos', ylab = 'WSS')
+```
