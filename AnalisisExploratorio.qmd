@@ -19,6 +19,11 @@ library(VarSelLCM)
 library(fpc)
 library(ggplot2)
 library(factoextra)
+library(hopkins)
+library(ggrepel)
+library(cluster)
+library(flexclust)
+library(NbClust)
 ```
 
 ```{r db}
@@ -582,18 +587,35 @@ db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.factor, as.numeric)
 db_1221_mutate  <- na.omit(db_1221_mutate)
 km <- kmeans(db_1221_mutate, 3 , iter.max = 1000)
 db_1221_mutate$grupo <- km$cluster
-plotcluster(db_1221_mutate[1:36], km$cluster)
-
+plotcluster(db_1221_mutate[1:43], km$cluster)
+print(km)
+db_1221_mutate %>%
+  mutate(Cluster = km$cluster) %>%
+  group_by(Cluster) %>%
+  summarise_all("mean")
 
 db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.character, as.numeric)
 db_1221_mutate <- dplyr::mutate_if(db12_21NoNa, is.factor, as.numeric)
 db_1221_mutate  <- na.omit(db_1221_mutate)
 km2 <- kmeans(db_1221_mutate, 4 , iter.max = 1000)
 db_1221_mutate$grupo <- km2$cluster
-plotcluster(db_1221_mutate[1:36], km2$cluster)
+plotcluster(db_1221_mutate[1:43], km2$cluster)
+print(km2)
+db_1221_mutate %>%
+  mutate(Cluster = km2$cluster) %>%
+  group_by(Cluster) %>%
+  summarise_all("mean")
 
 ```
 
 Se realizaron los clusters, tanto para 3 como 4, ya que estos son los valores ideales que nos retorno la gráfica de codo, y estos seran los valores con los que vamos a trabajr nuestro clustering.
 
-# `{r} # db_1221_mutate # fviz_cluster(km, data = db_1221_mutate[40:44], drop = TRUE, geom = "point", ellipse.type = "norm") #  #`
+```{r Silueta}
+
+silkm<-silhouette(km2$cluster,dist(db_1221_mutate))
+
+pam.res3 <- pam(db_1221_mutate, 4,  metric = "euclidean", stand = FALSE)
+
+fviz_silhouette(pam.res3, palette = "jco", ggtheme = theme_classic())
+# db_1221_mutate # fviz_cluster(km, data = db_1221_mutate[40:44], drop = TRUE, geom = "point", ellipse.type = "norm") # 
+```

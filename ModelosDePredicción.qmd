@@ -1,0 +1,35 @@
+---
+title: "ModelosDePrediccion"
+format: html
+editor: visual
+---
+
+# Modelos de predicción: Concesión de medidas de seguridad
+
+```{r librerias}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(ggcorrplot)
+library(ggplot2)
+library(caret)
+```
+
+TEXTO EXPLICATIVO
+
+## Limpieza y obtención de datos
+
+Utilizando el análisis explotariorio realizado, se determinó
+
+```{r db}
+db2012<- read_excel("Bases de Datos/Datos2012.xlsx")
+db2013<- read_excel("Bases de Datos/Datos2013.xlsx")
+db2014<- read_excel("Bases de Datos/Datos2014.xlsx")
+db2015<- read_excel("Bases de Datos/Datos2015.xlsx")
+db2016<- read_excel("Bases de Datos/Datos2016.xlsx")
+db2017<- read_excel("Bases de Datos/Datos2017.xlsx")
+db2018<- read_excel("Bases de Datos/Datos2018.xlsx")
+db2019<- read_excel("Bases de Datos/Datos2019.xls")
+db2020<- read_excel("Bases de Datos/Datos2020.xls")
+db2021<- read_excel("Bases de Datos/Datos2021.xlsx")
+```
