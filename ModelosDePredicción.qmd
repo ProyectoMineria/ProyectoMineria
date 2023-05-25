@@ -7,12 +7,12 @@ editor: visual
 # Modelos de predicción: Concesión de medidas de seguridad
 
 ```{r librerias}
-library(readxl)
-library(dplyr)
 library(tidyverse)
 library(ggcorrplot)
 library(ggplot2)
 library(caret)
+library(naniar)
+library(nnet)
 ```
 
 TEXTO EXPLICATIVO
@@ -22,14 +22,73 @@ TEXTO EXPLICATIVO
 Utilizando el análisis explotariorio realizado, se determinó
 
 ```{r db}
-db2012<- read_excel("Bases de Datos/Datos2012.xlsx")
-db2013<- read_excel("Bases de Datos/Datos2013.xlsx")
-db2014<- read_excel("Bases de Datos/Datos2014.xlsx")
-db2015<- read_excel("Bases de Datos/Datos2015.xlsx")
-db2016<- read_excel("Bases de Datos/Datos2016.xlsx")
-db2017<- read_excel("Bases de Datos/Datos2017.xlsx")
-db2018<- read_excel("Bases de Datos/Datos2018.xlsx")
-db2019<- read_excel("Bases de Datos/Datos2019.xls")
-db2020<- read_excel("Bases de Datos/Datos2020.xls")
-db2021<- read_excel("Bases de Datos/Datos2021.xlsx")
+db12_21 <- read.csv("Bases de Datos/Datos12_21.csv")
+
+db12_21 <- db12_21 %>% mutate_at(c('MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), ~replace_na(., 10))
+
+db12_21 <- db12_21 %>% mutate_at('AGR_OCUP', ~replace_na(., 9999))
+
+asignar.depto <- function(x) {
+  d <- '0'
+  
+  if (x < 1000) {
+    d <- substr(x, 1, 1)
+  } else {
+    d <- substr(x, 1, 2)
+  }
+  
+  return(switch(d, '1' = 'Guatemala', '2' = 'El Progreso', '3' = 'Sacatepequez', '4' = 'Chimaltenango', '5' = 'Escuintla', '6' = 'Santa Rosa', '7' = 'Solola', '8' = 'Totonicapan', '9' = 'Quetzaltenango', '10' = 'Suchitepequz', '11' = 'Retalhuleu', '12' = 'San Marcos', '13' = 'Huehuetenango', '14' = 'Quiche', '15' = 'Baja Verapaz', '16' = 'Alta Verapaz', '17' = 'Peten', '18' = 'Izabal', '19' = 'Zacapa', '20' = 'Chiquimula', '21' = 'Jalapa', '22' = 'Jutiapa'))
+}
+
+db12_21['DEPTO_DEN'] <- sapply(db12_21$DEPTO_MCPIO, FUN = asignar.depto)
+
+db12_21['DEPTO_HEC'] <- sapply(db12_21$HEC_DEPTOMCPIO, FUN = asignar.depto)
+
+db12_21 <- db12_21 %>% mutate_at(c('VIC_EDAD', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ', 'HEC_MES', 'AGR_EDAD'), as.numeric)
+
+db12_21 <- db12_21 %>% replace_with_na(replace = list('VIC_EDAD' = 99, 'TOTAL_HIJOS' = 99, 'NUM_HIJ_HOM' = 99, 'NUM_HIJ_MUJ' = 99, 'HEC_MES' = 99, 'AGR_EDAD' = 99))
+
+db12_21 <- db12_21 %>% mutate_at(c('DEPTO_DEN', 'QUIEN_REPORTA', 'VIC_SEXO', 'VIC_ALFAB', 'VIC_ESCOLARIDAD', 'VIC_EST_CIV', 'VIC_GRUPET', 'VIC_NACIONAL', 'VIC_TRABAJA', 'VIC_OCUP', 'VIC_DISC', 'VIC_REL_AGR', 'HEC_DEPTOMCPIO', 'HEC_AREA', 'HEC_TIPAGRE', 'HEC_RECUR_DENUN', 'AGR_SEXO', 'AGR_ALFAB', 'AGR_ESCOLARIDAD', 'AGR_EST_CIV', 'AGR_NACIONAL', 'AGR_TRABAJA', 'AGR_OCUP', 'INST_DENUN_HECHO', 'MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), as.factor)
+colnames(db12_21)
+
+db12_21 <- db12_21[, -c(1, 2, 3, 4, 17, 'VIC_DEDICA', 'TIPO_DISCAQ', 'OTRAS_VICTIMAS', 'VIC_OTRAS_HOM', 'VIC_OTRAS_MUJ', 'VIC_OTRAS_N_OS', 'VIC_OTRAS_N_AS', 'HEC_DIA', 'HEC_ANO', 'INST_DONDE_DENUNCIO', 'AGR_DEDICA')]
+
+db12_21 <- db12_21[complete.cases(db12_21), ]
 ```
+
+## Muestreo
+
+```{r muestreo}
+set.seed(645)
+
+med1 = db12_21[db12_21$MEDIDAS_SEGURIDAD == 1,]
+med2 = db12_21[db12_21$MEDIDAS_SEGURIDAD == 2,]
+med9 = db12_21[db12_21$MEDIDAS_SEGURIDAD == 9,]
+med10 = db12_21[db12_21$MEDIDAS_SEGURIDAD == 10,]
+
+med1_s = sample(nrow(med1), nrow(med1) * 0.7)
+med2_s = sample(nrow(med2), nrow(med2) * 0.7)
+med9_s = sample(nrow(med9), nrow(med9) * 0.7)
+med10_s = sample(nrow(med10), nrow(med10) * 0.7)
+
+train <- rbind(med1[med1_s,], med2[med2_s,], med9[med9_s,], med10[med10_s,])
+test <- rbind(med1[-med1_s,], med2[-med2_s,], med9[-med9_s,], med10[-med10_s,])
+```
+
+## Modelos
+
+### Redes neuronales
+
+#### Sigmoid
+
+```{r rna_sig}
+sgm <- function(x) 1/(1 + exp(-x))
+
+str(train)
+
+mod_sig_1 <- nnet(MEDIDAS_SEGURIDAD ~., data = train, size = 2, na.action = na.omit, rang = 0.1, decay = 5e-4, maxit = 200)
+
+mod_sig_2 <- neuralnet(MEDIDAS_SEGURIDAD ~., data = na.omit(train), hidden = 4, act.fct = sgm, threshold = 0.2)
+```
+
+#### Softmax
