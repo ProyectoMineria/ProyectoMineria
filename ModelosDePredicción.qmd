@@ -14,6 +14,8 @@ library(caret)
 library(naniar)
 library(nnet)
 library(RWeka)
+library(xgboost)
+library(e1071)
 ```
 
 TEXTO EXPLICATIVO
@@ -124,4 +126,46 @@ columnaMasAlta2 <- apply(prediccion2, 1, function(x) colnames(prediccion2)[which
 
 cfm<-confusionMatrix(as.factor(columnaMasAlta2),test$MEDIDAS_SEGURIDAD)
 cfm
+```
+
+```{r xgboost}
+train.data <- data.matrix(train[,-5])
+train.label <- train[,5]
+test.data <- data.matrix(test[,-5])
+test.label <- test[,5]
+params <- list(
+  booster = "gbtree",
+  objective = "multi:softprob",
+  num_class = 31, 
+  eta=0.3,
+  gamma=0,
+  max_depth=6,
+  min_child_weight=1,
+  subsample=1,
+  colsample_bytree=1
+)
+
+```
+
+```{r}
+xgb.fit <- xgboost(
+  params = params, 
+  data = train.data, 
+  nrounds = 100, 
+  label = train.label, 
+  nthread = 2, 
+  print_every_n = 10
+)
+
+```
+
+```{r}
+pred <- predict(xgb.fit, test.data)
+pred <- matrix(pred, ncol=3, byrow=TRUE)
+pred.label <- max.col(pred) 
+```
+
+```{r}
+confusionMatrix(pred.label, test.label) 
+
 ```
