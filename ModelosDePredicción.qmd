@@ -29,7 +29,9 @@ db12_21 <- db12_21 %>% mutate_at(c('MEDIDAS_SEGURIDAD', 'LEY_APLICABLE'), ~repla
 
 db12_21 <- db12_21 %>% mutate_at('AGR_OCUP', ~replace_na(., 9999))
 
-db12_21 <- db12_21 %>% replace_with_na(replace = list('VIC_EDAD' = 99, 'HEC_MES' = 99, 'AGR_EDAD' = 99, 'HEC_DEPTOMCPIO' = 9999))
+db12_21 <- db12_21 %>% replace_with_na(replace = list('VIC_EDAD' = 99, 'HEC_MES' = 99, 'AGR_EDAD' = 99, 'HEC_DEPTOMCPIO' = 9999, 'OTRAS_VICTIMAS' = 99))
+
+db12_21$OTRAS_VICTIMAS[is.na(db12_21$OTRAS_VICTIMAS)] <- 1
 
 asignar.depto <- function(x) {
   d <- '0'
@@ -58,7 +60,7 @@ asignar.ocup <- function(x) {
   
   d <- substr(x, 1, 1)
   
-  return(switch(d, '1' = d, '2' = d, '3' = d, '4' = d, '5' = d, '6' = d, '7' = d, '8' = d, '9' = d, '´' = '0'))
+  return(switch(d, '1' = 'Gestores', '2' = 'Profesionales', '3' = 'Tecnicos y profesionales asociados', '4' = 'Empleados de apoyo administrativo', '5' = 'Trabajadores de servicios y ventas', '6' = 'Trabajadores cualificados de la agricultura, la silvicultura y la pesca', '7' = 'Artesanos y trabajadores de oficios conexos', '8' = 'Operadores de instalaciones y máquinas, y montadores', '9' = 'Ocupaciones elementales', '´' = 'Ocupaciones de las Fuerzas Armadas'))
 }
 
 db12_21['DEPTO_DEN'] <- sapply(db12_21$DEPTO_MCPIO, FUN = asignar.depto)
@@ -71,9 +73,7 @@ db12_21 <- db12_21 %>% mutate_at(c('VIC_EDAD',  'HEC_MES', 'AGR_EDAD'), as.numer
 
 db12_21 <- db12_21 %>% mutate_at(c('DEPTO_DEN','DEPTO_HEC', 'QUIEN_REPORTA', 'VIC_SEXO', 'VIC_ALFAB', 'VIC_ESCOLARIDAD', 'VIC_EST_CIV', 'VIC_GRUPET', 'VIC_NACIONAL', 'VIC_TRABAJA', 'VIC_OCUP', 'VIC_DISC', 'VIC_REL_AGR', 'HEC_AREA', 'HEC_TIPAGRE', 'HEC_RECUR_DENUN', 'AGR_SEXO', 'AGR_ALFAB', 'AGR_ESCOLARIDAD', 'AGR_EST_CIV', 'AGR_NACIONAL', 'AGR_TRABAJA', 'AGR_OCUP', 'INST_DENUN_HECHO', 'MEDIDAS_SEGURIDAD', 'LEY_APLICABLE', 'TOTAL_HIJOS', 'NUM_HIJ_HOM', 'NUM_HIJ_MUJ'), as.factor)
 
-db12_21 <- db12_21[, -c(1, 2, 3, 4, 17, 18, 20, 22, 23, 24, 25, 26, 27, 29, 30, 34, 43)]
-
-colSums(is.na(db12_21))
+db12_21 <- db12_21[, -c(1, 2, 3, 4, 17, 18, 20, 23, 24, 25, 26, 27, 29, 30, 34, 43)]
 
 db12_21 <- db12_21[complete.cases(db12_21), ]
 ```
@@ -90,24 +90,25 @@ med10 = db12_21[db12_21$MEDIDAS_SEGURIDAD == 10,]
 
 med1_s = sample(nrow(med1), nrow(med1) * 0.7)
 med2_s = sample(nrow(med2), nrow(med2) * 0.7)
-med9_s = sample(nrow(med9), nrow(med9) * 0.7)
-med10_s = sample(nrow(med10), nrow(med10) * 0.7)
+med9_s = sample(nrow(med9), nrow(med9) * 0.5)
+med10_s = sample(nrow(med10), nrow(med10) * 0.5)
 
-train <- rbind(med1[med1_s,], med2[med2_s,], med9[med9_s,], med10[med10_s,])
-test <- rbind(med1[-med1_s,], med2[-med2_s,], med9[-med9_s,], med10[-med10_s,])
+train <- rbind(med1[-med1_s,], med2[med2_s,], med9[med9_s,], med10[med10_s,])
+test <- rbind(med1[med1_s,], med2[-med2_s,], med9[-med9_s,], med10[-med10_s,])
 ```
 
 ## Modelos
 
-### Redes neuronales
+### Redes neuronales NNET
 
 #### Linear Output units
 
 ```{r rna_linear}
-mod_sig_1 <- nnet(MEDIDAS_SEGURIDAD ~., data = train, size = 2, na.action = na.omit, rang = 0.1, decay = 5e-4, maxit = 200)
+mod_sig_1 <- nnet(MEDIDAS_SEGURIDAD ~., data = train, size = 2, na.action = na.omit, rang = 0.1, decay = 5e-3, maxit = 200)
 
-prediccion1 <- as.data.frame(predict(mod_sig_1, newdata = test[,-27]))
+prediccion1 <- as.data.frame(predict(mod_sig_1, newdata = test[,-29]))
 columnaMasAlta1 <- apply(prediccion1, 1, function(x) colnames(prediccion1)[which.max(x)])
+test$pred <- columnaMasAlta1
 
 cfm<-confusionMatrix(as.factor(columnaMasAlta1),test$MEDIDAS_SEGURIDAD)
 cfm
@@ -118,7 +119,7 @@ cfm
 ```{r rna_logistic}
 mod_sig_2 <- nnet(MEDIDAS_SEGURIDAD ~., data = train, size = 2, na.action = na.omit, rang = 0.1, decay = 5e-4, maxit = 200, lineout = T)
 
-prediccion2 <- as.data.frame(predict(mod_sig_2, newdata = test[,-c(27, 31)]))
+prediccion2 <- as.data.frame(predict(mod_sig_2, newdata = test[,-c(29)]))
 columnaMasAlta2 <- apply(prediccion2, 1, function(x) colnames(prediccion2)[which.max(x)])
 
 cfm<-confusionMatrix(as.factor(columnaMasAlta2),test$MEDIDAS_SEGURIDAD)
