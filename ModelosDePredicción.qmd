@@ -128,11 +128,15 @@ cfm<-confusionMatrix(as.factor(columnaMasAlta2),test$MEDIDAS_SEGURIDAD)
 cfm
 ```
 
+## Árboles de clasificación
+
+### XGBoost
+
 ```{r xgboost}
-train.data <- data.matrix(train[,-5])
-train.label <- train[,5]
-test.data <- data.matrix(test[,-5])
-test.label <- test[,5]
+train.data <- data.matrix(train[,-4])
+train.label <- train[,4]
+test.data <- data.matrix(test[,-4])
+test.label <- test[,4]
 params <- list(
   booster = "gbtree",
   objective = "multi:softprob",
@@ -160,12 +164,33 @@ xgb.fit <- xgboost(
 ```
 
 ```{r}
-pred <- predict(xgb.fit, test.data)
+pred <- predict(xgb.fit, newdata = test[, -c(4, 29)])
 pred <- matrix(pred, ncol=3, byrow=TRUE)
 pred.label <- max.col(pred) 
 ```
 
 ```{r}
 confusionMatrix(pred.label, test.label) 
+```
+
+## SVM
+
+### Radial
+
+```{r}
+
+radialSVM<-svm(MEDIDAS_SEGURIDAD~., data=train, gamma=2^-5, kernel="radial")
+summary(radialSVM)
+prediccion1 <- predict(radialSVM, newdata = test[,-29])
+confusionMatrix(test[complete.cases(test), 29], prediccion1)
+
+```
+
+### Polinomial
+
+```{r}
+polinomSVM<-svm(MEDIDAS_SEGURIDAD~., data=train, cost= 2e-4, kernel="polynomial", degree = 2, coef = 1)
+prediccion2 <- predict(polinomSVM, newdata = test[,-29])
+confusionMatrix(test[complete.cases(test), 29], prediccion2)
 
 ```
